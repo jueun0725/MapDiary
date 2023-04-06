@@ -6,17 +6,9 @@
 </head>
 <body>
 <br>
-카카오 지도 띄우기...
+<h3>지도 띄우고 클릭한 곳에 마커 생성</h3>
 <div id="map" style="width:500px;height:400px;"></div>
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d6eb27aab7c2199d9381fcbf9223387f"></script>
-<script>
-  var container = document.getElementById('map');
-  var options = {
-    center: new kakao.maps.LatLng(33.450701, 126.570667),
-    level: 3
-  };
-
-  var map = new kakao.maps.Map(container, options);
-</script>
+<script type="text/javascript" src="../map.js"></script>
 </body>
 </html>
