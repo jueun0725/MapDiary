@@ -6,10 +6,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/diary")
@@ -18,9 +21,10 @@ public class DiaryController { //홈 화면에서 보여지는 캘린더
     private JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
 
     @GetMapping
-    public String showDiary() {
-        // 캘린더 화면을 보여주는 로직
-        return "diary";
+    public ModelAndView showDiary() {
+        ModelAndView modelAndView = new ModelAndView("diary");
+        modelAndView.addObject("diaries", diaryMap.values());
+        return modelAndView;
     }
 
     //장소 등록 API
@@ -44,10 +48,9 @@ public class DiaryController { //홈 화면에서 보여지는 캘린더
             Diary diary = Diary.createDiary(date, title, description, latitude, longitude, placeName);
             diaryMap.put(diary.getId(), diary);
 
-            ObjectNode response = jsonNodeFactory.objectNode();
-            response.put("code", 200);
-            response.put("message", "장소 등록에 성공했습니다");
-            return ResponseEntity.ok(response);
+            // 사용자를 location.html로 리다이렉트
+            URI location = new URI("location.html");
+            return ResponseEntity.status(HttpStatus.OK).location(location).build();
 
         } catch (Exception e) {
             ObjectNode response = jsonNodeFactory.objectNode();
@@ -67,7 +70,6 @@ public class DiaryController { //홈 화면에서 보여지는 캘린더
                 response.put("message", "캘린더에 등록된 내용이 없습니다");
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
             }
-
             return ResponseEntity.ok(diaryMap);
 
         } catch (Exception e) {
