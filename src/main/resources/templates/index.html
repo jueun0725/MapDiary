@@ -63,8 +63,8 @@
   <div id="modal" style="display: none;">
     <input type="text" id="title" placeholder="제목"><br>
     <textarea id="description" placeholder="설명"></textarea><br>
-<!--    <input type="text" id="latitude" placeholder="위도"><br>-->
-<!--    <input type="text" id="longitude" placeholder="경도"><br>-->
+    <input type="text" id="latitude" placeholder="위도"><br>
+    <input type="text" id="longitude" placeholder="경도"><br>
     <div id="placeNameContainer" style="display: flex; align-items: center;">
       <input type="text" id="placeName" placeholder="장소명">
       <i class="fa-regular fa-map" style="margin-left: 5px;" onclick="searchMap()"></i>
@@ -99,8 +99,8 @@
     // 입력된 데이터 가져오기
     var title = $('#title').val();
     var description = $('#description').val();
-    // var latitude = $('#latitude').val();
-    // var longitude = $('#longitude').val();
+    var latitude = $('#latitude').val();
+    var longitude = $('#longitude').val();
     var placeName = $('#placeName').val();
 
     // API 호출
@@ -111,8 +111,8 @@
         date: arg.start,
         title: title,
         description: description,
-        // latitude: latitude,
-        // longitude: longitude,
+        latitude: latitude,
+        longitude: longitude,
         placeName: placeName
       },
       success: function(response) {
@@ -139,8 +139,8 @@
     // 이벤트 정보 가져오기
     var title = $('#title').val();
     var description = $('#description').val();
-    // var latitude = $('#latitude').val();
-    // var longitude = $('#longitude').val();
+    var latitude = $('#latitude').val();
+    var longitude = $('#longitude').val();
     var placeName = $('#placeName').val();
 
     // API 호출
@@ -211,8 +211,8 @@
           // 입력 필드 초기화
           $('#title').val('');
           $('#description').val('');
-          // $('#latitude').val('');
-          // $('#longitude').val('');
+          $('#latitude').val('');
+          $('#longitude').val('');
           $('#placeName').val('');
 
           // 등록 버튼 클릭 이벤트 처리
@@ -220,8 +220,8 @@
             // 입력된 데이터 가져오기
             var title = $('#title').val();
             var description = $('#description').val();
-            // var latitude = $('#latitude').val();
-            // var longitude = $('#longitude').val();
+            var latitude = $('#latitude').val();
+            var longitude = $('#longitude').val();
             var placeName = $('#placeName').val();
 
             // API 호출 등록 성공 후에 이벤트를 캘린더에 추가
@@ -232,8 +232,8 @@
                 date: arg.start,
                 title: title,
                 description: description,
-                // latitude: latitude,
-                // longitude: longitude,
+                latitude: latitude,
+                longitude: longitude,
                 placeName: placeName
               },
               success: function(response) {
@@ -274,15 +274,15 @@
           // 이벤트 정보 가져오기
           var title = arg.event.title;
           var description = arg.event.description;
-          // var latitude = arg.event.latitude;
-          // var longitude = arg.event.longitude;
+          var latitude = arg.event.latitude;
+          var longitude = arg.event.longitude;
           var placeName = arg.event.placeName;
 
           // 입력 필드에 이벤트 정보 채우기
           $('#title').val(title);
           $('#description').val(description);
-          // $('#latitude').val(latitude);
-          // $('#longitude').val(longitude);
+          $('#latitude').val(latitude);
+          $('#longitude').val(longitude);
           $('#placeName').val(placeName);
 
           // 수정 버튼 클릭 이벤트 처리
