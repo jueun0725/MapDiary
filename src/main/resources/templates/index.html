@@ -67,7 +67,7 @@
     <input type="text" id="longitude" placeholder="경도"><br>
     <div id="placeNameContainer" style="display: flex; align-items: center;">
       <input type="text" id="placeName" placeholder="장소명">
-      <i class="fa-regular fa-map" style="margin-left: 5px;"></i>
+      <i class="fa-regular fa-map" style="margin-left: 5px;" onclick="searchMap()"></i>
     </div>
 
     <button id="registerBtn">등록</button>
@@ -76,6 +76,10 @@
 </div>
 
 <script>
+  function searchMap() {
+    console.log('지도 버튼 누름');
+    location.href = "/location";
+  }
   // 등록 버튼 클릭 이벤트 핸들러
   function handleRegisterButtonClick(arg) {
     // 입력된 데이터 가져오기
