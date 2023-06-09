@@ -1,3 +1,4 @@
+/*
 var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
 var options = { //지도를 생성할 때 필요한 기본 옵션
     center: new kakao.maps.LatLng(37.5813115, 127.0093783), //지도의 중심좌표.
@@ -24,4 +25,12 @@ kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
     // 마커 위치를 클릭한 위치로 옮깁니다
     marker.setPosition(latlng);
 
+});*/
+
+// 아이콘 클릭 이벤트 핸들러 추가
+const icon = document.querySelector('.fa-map');
+icon.addEventListener('click', function() {
+    // 카카오맵을 여기에서 띄우는 코드 작성
+    // 예시로 콘솔에 메시지를 출력하는 코드를 작성하였습니다.
+    console.log('카카오맵을 띄웁니다.');
 });

@@ -10,6 +10,8 @@
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js'></script>
   <!-- fullcalendar 언어 CDN -->
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/locales-all.min.js'></script>
+  <script src="https://kit.fontawesome.com/bba23df0a7.js" crossorigin="anonymous"></script>
+ <!--  <script src="/static/map.js"></script> -->
   <style>
     /* body 스타일 */
     html, body {
@@ -23,59 +25,267 @@
       padding-left: 1em;
       padding-right: 1em;
     }
+    /* 모달 스타일 */
+    #modal {
+      position: absolute;
+      z-index: 9999;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #b1def5;
+      width: 500px; /* 모달 창의 너비 */
+      height: 400px; /* 모달 창의 높이 */
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    /* 입력 창 스타일 */
+    #title, #description, #latitude, #longitude, #placeName {
+      width: 100%; /* 입력 창의 너비를 100%로 설정하여 모달 창 내에서 꽉 차게 만듦 */
+      height: 40px; /* 입력 창의 높이를 40px로 설정하여 크기를 키움 */
+      margin-bottom: 10px; /* 입력 창들 사이의 간격 설정 */
+    }
+    /* 버튼 스타일 */
+    #registerBtn, #closeBtn {
+      width: 200px; /* 버튼의 너비 증가 */
+      height: 50px; /* 버튼의 높이 증가 */
+      margin-top: 20px; /* 버튼 위쪽 간격 설정 */
+    }
   </style>
   <title>Map Diary</title>
 </head>
 <body style="padding:30px;">
-  <!-- calendar 태그 -->
-  <div id="calendar-container">
-    <div id="calendar"></div>
+<!-- calendar 태그 -->
+<div id="calendar-container">
+  <div id="calendar"></div>
+  <div id="modal" style="display: none;">
+    <input type="text" id="title" placeholder="제목"><br>
+    <textarea id="description" placeholder="설명"></textarea><br>
+    <input type="text" id="latitude" placeholder="위도"><br>
+    <input type="text" id="longitude" placeholder="경도"><br>
+    <div id="placeNameContainer" style="display: flex; align-items: center;">
+      <input type="text" id="placeName" placeholder="장소명">
+      <i class="fa-regular fa-map" style="margin-left: 5px;"></i>
+    </div>
+
+    <button id="registerBtn">등록</button>
+    <button id="closeBtn">닫기</button>
   </div>
-  <script>
-    (function(){
-      $(function(){
-        const calendarEl = $('#calendar')[0];
-        const calendar = new FullCalendar.Calendar(calendarEl, { // full-calendar 생성
-          height: '800px', // calendar 높이 설정
-          expandRows: true, // 화면에 맞게 높이 재설정
-          headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek'
-          },
-          initialView: 'dayGridMonth', // 초기 로드 시 보이는 캘린더 (기본 설정: 달)
-          editable: true,
-          selectable: true, // 달력 일자 드래그 설정가능
-          dayMaxEvents: true, // 이벤트가 오버되면 높이 제한 (+ 몇 개)
-          locale: 'ko',
-          eventAdd: function(obj) { // 이벤트가 추가되면 발생하는 이벤트
-            console.log(obj);
-          },
-          eventChange: function(obj) { // 이벤트가 수정되면 발생하는 이벤트
-            console.log(obj);
-          },
-          eventRemove: function(obj){ // 이벤트가 삭제되면 발생하는 이벤트
-            console.log(obj);
-          },
-          select: function(arg) { // 캘린더에서 드래그로 이벤트 생성
-            const title = prompt('기록하고 싶은 장소를 입력하세요.');
-            if (title) {
-              calendar.addEvent({
-                title: title,
-                start: arg.start,
-                end: arg.end,
-                allDay: arg.allDay
-              })
-            }
-            calendar.unselect()
-          },
+</div>
+
+<script>
+  // 등록 버튼 클릭 이벤트 핸들러
+  function handleRegisterButtonClick(arg) {
+    // 입력된 데이터 가져오기
+    var title = $('#title').val();
+    var description = $('#description').val();
+    var latitude = $('#latitude').val();
+    var longitude = $('#longitude').val();
+    var placeName = $('#placeName').val();
+
+    // API 호출
+    $.ajax({
+      url: 'diary/register',
+      type: 'POST',
+      data: {
+        date: arg.start,
+        title: title,
+        description: description,
+        latitude: latitude,
+        longitude: longitude,
+        placeName: placeName
+      },
+      success: function(response) {
+        console.log('장소 등록 성공:', response);
+        // 등록 성공 시 모달 창 닫기
+        $('#modal').css('display', 'none');
+        // 캘린더에 등록한 이벤트 표시하기
+        var calendar = new FullCalendar.Calendar($('#calendar')[0]);
+        calendar.addEvent({
+          title: title,
+          start: arg.start,
+          end: arg.end,
+          allDay: arg.allDay
         });
-        calendar.render(); // 캘린더 랜더링
+
+      },
+      error: function(xhr, status, error) {
+        console.log('장소 등록 실패:', error);
+      }
+    });
+  }
+  // 수정 버튼 클릭 이벤트 핸들러
+  function handleEditButtonClick(arg) {
+    // 이벤트 정보 가져오기
+    var title = $('#title').val();
+    var description = $('#description').val();
+    var latitude = $('#latitude').val();
+    var longitude = $('#longitude').val();
+    var placeName = $('#placeName').val();
+
+    // API 호출
+    $.ajax({
+      url: 'diary/update/'+arg.event.id,
+      type: 'PUT',
+      data: {
+        date: arg.start,
+        title: title,
+        description: description,
+        latitude: latitude,
+        longitude: longitude,
+        placeName: placeName
+      },
+      success: function(response) {
+        console.log('장소 수정 성공:', response);
+        // 수정 성공 시 모달 창 닫기
+        $('#modal').css('display', 'none');
+        // 캘린더에 수정한 이벤트 반영하기
+        arg.event.setProp('title', title);
+      },
+      error: function(xhr, status, error) {
+        console.log('장소 수정 실패:', error);
+      }
+    });
+  }
+  (function(){
+    $(function(){
+      const calendarEl = $('#calendar')[0];
+      const calendar = new FullCalendar.Calendar(calendarEl, { // full-calendar 생성
+        height: '800px', // calendar 높이 설정
+        expandRows: true, // 화면에 맞게 높이 재설정
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek'
+        },
+        initialView: 'dayGridMonth', // 초기 로드 시 보이는 캘린더 (기본 설정: 달)
+        editable: true,
+        selectable: true, // 달력 일자 드래그 설정가능
+        dayMaxEvents: true, // 이벤트가 오버되면 높이 제한 (+ 몇 개)
+        locale: 'ko',
+        eventAdd: function(obj) { // 이벤트가 추가되면 발생하는 이벤트
+          console.log(obj);
+        },
+        eventChange: function(obj) { // 이벤트가 수정되면 발생하는 이벤트
+          console.log(obj);
+        },
+        eventRemove: function(obj){ // 이벤트가 삭제되면 발생하는 이벤트
+          console.log(obj);
+        },
+       /* select: function(arg) { // 캘린더에서 드래그로 이벤트 생성
+          const title = prompt('기록하고 싶은 장소를 입력하세요.');
+          if (title) {
+            calendar.addEvent({
+              title: title,
+              start: arg.start,
+              end: arg.end,
+              allDay: arg.allDay
+            })
+          }
+          calendar.unselect()
+        },*/
+        select: function(arg) {
+          // 모달 창 열기
+          $('#modal').css('display', 'block');
+
+          // 입력 필드 초기화
+          $('#title').val('');
+          $('#description').val('');
+          $('#latitude').val('');
+          $('#longitude').val('');
+          $('#placeName').val('');
+
+          // 등록 버튼 클릭 이벤트 처리
+          $('#registerBtn').off('click').on('click', function() {
+            // 입력된 데이터 가져오기
+            var title = $('#title').val();
+            var description = $('#description').val();
+            var latitude = $('#latitude').val();
+            var longitude = $('#longitude').val();
+            var placeName = $('#placeName').val();
+
+            // API 호출 등록 성공 후에 이벤트를 캘린더에 추가
+            $.ajax({
+              url: 'diary/register',
+              type: 'POST',
+              data: {
+                date: arg.start,
+                title: title,
+                description: description,
+                latitude: latitude,
+                longitude: longitude,
+                placeName: placeName
+              },
+              success: function(response) {
+                console.log('장소 등록 성공:', response);
+
+                // 등록 성공 시 모달 창 닫기
+                $('#modal').css('display', 'none');
+
+                // 캘린더에 이벤트 추가
+                calendar.addEvent({
+                  title: title,
+                  start: arg.start,
+                  end: arg.end,
+                  allDay: arg.allDay
+                });
+
+                //캘린더 다시 렌더링
+                calendar.render();
+              },
+              error: function(xhr, status, error) {
+                console.log('장소 등록 실패:', error);
+                // 등록 실패 시 에러 메시지 표시 등의 처리
+              }
+            });
+          });
+          // 닫기 버튼 클릭 이벤트 처리
+          $('#closeBtn').click(function() {
+            $('#modal').css('display', 'none');
+          });
+          calendar.unselect();
+        },
+
+        eventClick: function(arg) {
+          // 모달 창 열기
+          $('#modal').css('display', 'block');
+
+          console.log(arg.event);
+          // 이벤트 정보 가져오기
+          var title = arg.event.title;
+          var description = arg.event.description;
+          var latitude = arg.event.latitude;
+          var longitude = arg.event.longitude;
+          var placeName = arg.event.placeName;
+
+          // 입력 필드에 이벤트 정보 채우기
+          $('#title').val(title);
+          $('#description').val(description);
+          $('#latitude').val(latitude);
+          $('#longitude').val(longitude);
+          $('#placeName').val(placeName);
+
+          // 수정 버튼 클릭 이벤트 처리
+          $('#registerBtn').off('click').on('click', function() {
+            handleEditButtonClick(arg);
+          });
+
+          // 닫기 버튼 클릭 이벤트 처리
+          $('#closeBtn').click(function() {
+            $('#modal').css('display', 'none');
+          });
+
+          calendar.unselect();
+        },
       });
-    })();
-  </script>
+      calendar.render(); // 캘린더 랜더링
+    });
+  })();
+</script>
 <!--  <div id="map" style="width:500px;height:400px;"></div>-->
-  <!--<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d6eb27aab7c2199d9381fcbf9223387f"></script>
-  <script type="text/javascript" src="../map.js"></script>-->
+<!--<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d6eb27aab7c2199d9381fcbf9223387f"></script>
+<script type="text/javascript" src="../map.js"></script>-->
 </body>
 </html>
